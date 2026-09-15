@@ -1,0 +1,27 @@
+services:
+  app:
+    build: .
+    container_name: ${PROJECT_NAME:-project_name}
+    ports:
+      - "${APP_PORT:-8081}:8080"
+    command: >
+      sh -c '
+        echo "==================================================";
+        echo " Application status: READY";
+        echo " URL: http://localhost:${APP_PORT:-8081}";
+        echo "==================================================";
+        exec catalina.sh run
+      '
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - JAVA_OPTS=-Ddb.host=${DB_HOST:-host.docker.internal} -Ddb.port=${DB_PORT:-3306} -Ddb.name=${DB_NAME:-myapp_db} -Ddb.user=${DB_USER:-root} -Ddb.pass=${DB_PASS:-123}
+      - PROJECT_NAME=${PROJECT_NAME:-app_web}
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME:-myapp_db}
+      - DB_USER=${DB_USER:-root}
+      - DB_PASS=${DB_PASS:-123}
