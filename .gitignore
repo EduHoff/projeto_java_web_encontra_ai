@@ -238,3 +238,5 @@ nbdist/
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/java,visualstudiocode,netbeans,eclipse,intellij
+
+!web/WEB-INF/lib/*.jar
