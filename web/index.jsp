@@ -1,34 +1,66 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.sql.Connection"%>
-<%@page import="dao.Conexao"%>
+<%@page import="model.Item"%>
+<%@page import="dao.ItemDAO"%>
+<%@page import="java.util.List"%>
+
+<%
+    ItemDAO itemDAO = new ItemDAO();
+    List<Item> itens = itemDAO.listarPublicos();
+%>
 
 <!DOCTYPE html>
-<html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <title>Teste de Conexão DAO</title>
-    </head>
-    <body>
-        <h1>Testando Conexão via dao.Conexao</h1>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>EncontraAi - Achados e Perdidos</title>
+    <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/img/logo.png">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+</head>
+<body class="pagina-publica">
+    <div class="publico-container">
+        <div class="publico-topo">
+            <div>
+                <h1>EncontraAi</h1>
+                <p>Objetos perdidos que ainda estão sendo procurados.</p>
+            </div>
 
-        <%
-            String statusTeste = "";
-            boolean deuCerto = false;
-
-            try (Connection conn = Conexao.conectar()) {
-                if (conn != null && !conn.isClosed()) {
-                    deuCerto = true;
-                    statusTeste = "Conexão via dao.Conexao.conectar() realizada com sucesso!";
-                } else {
-                    statusTeste = "A conexão retornou nula.";
-                }
-            } catch (Exception e) {
-                statusTeste = "Erro ao fechar ou abrir a conexão: " + e.getMessage();
-            }
-        %>
-
-        <div style="margin-top: 20px; padding: 15px; border-radius: 5px; background-color: <%= deuCerto ? "#d4edda" : "#f8d7da" %>; color: <%= deuCerto ? "#155724" : "#721c24" %>;">
-            <strong>Resultado:</strong> <%= statusTeste %>
+            <a class="btn-admin" href="admin/login.jsp">Área Administrativa</a>
         </div>
-    </body>
+
+        <% if (itens.isEmpty()) { %>
+            <div class="sem-itens">
+                <h2>Nenhum objeto perdido no momento.</h2>
+                <p>Não existem ocorrências abertas para consulta.</p>
+            </div>
+        <% } else { %>
+
+            <div class="grid-itens">
+                <% for (Item item : itens) { %>
+                    <div class="card-item">
+
+                        <% if (item.getImagem() != null && !item.getImagem().isEmpty()) { %>
+                            <img src="${pageContext.request.contextPath}/<%= item.getImagem() %>"
+                                 alt="<%= item.getNome() %>">
+                        <% } else { %>
+                            <div class="sem-imagem">Sem imagem</div>
+                        <% } %>
+
+                        <div class="card-conteudo">
+                            <span class="categoria"><%= item.getCategoria() %></span>
+                            <h2><%= item.getNome() %></h2>
+
+                            <p><strong>Local:</strong> <%= item.getLocal() %></p>
+                            <p><strong>Data:</strong> <%= item.getDataOcorrencia() %></p>
+
+                            <a href="detalhe_item.jsp?id=<%= item.getIdItem() %>">
+                                Ver detalhes
+                            </a>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+
+        <% } %>
+    </div>
+</body>
 </html>
